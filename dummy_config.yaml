@@ -1,0 +1,82 @@
+data:
+  path: Datasets
+  dataset: celeba
+  task: generate
+  scaler: "01"
+  shuffle_train: True
+  batch_size: 20
+  label_indices: [2, 8, 18, 19, 20, 24, 31, 34, 36, 39]  # Chosen indices for label transform
+  # Attractive, Black_hair, Heavy_Makeup, High_Cheekbones, Male, No_Beard, Smiling, Wearing_Earrings, 
+  # Wearing_Lipstick, Young
+  
+learning:
+  num_epochs: 20
+  testevery: 1
+  optimizer: Adam
+  criterion: MSELoss
+  diffusion_model: 'cddpm' # 'ddpm', 'cddpm', 'latent_dm' or 'conditional_latent_dm' only
+  noise_prediction_model: 'conditional_unet' # 'unet', 'unet_latent', 'conditional_unet', or 'conditional_unet_latent' only
+  layer: 'nlrl' # 'linear' or 'nlrl' only.
+  n_steps: 1000
+  learning_rate_exp: -3.53
+  denoising_option: 1
+
+network:
+  unet:
+    time_dim: 256
+    initial_in_channels: 3
+    final_out_channels: 3
+    hidden_channels: 64
+    device: "cuda"
+
+  conditional_unet:
+    time_dim: 256
+    initial_in_channels: 3
+    final_out_channels: 3
+    hidden_channels: 64
+    num_attributes: 10
+    device: "cuda"
+
+diffusion:
+  ddpm:
+    min_beta: 0.0001
+    max_beta: 0.02
+    image_chw: (3, 64, 64)
+    
+  latent:
+    min_beta: 0.0001
+    max_beta: 0.02
+    image_chw: (3, 64, 64)
+    denoiser: "Simple_en_de"
+    in_channels: 3
+    hidden_channels: 60
+
+classifier_nlrl: # make no changes
+  filter_growth_rate: 2
+  dropout_rate: 0.2
+  final_channel: 12
+  activation_function: RReLU
+  initial_out_channels: 32
+  final_layer: 'nlrl'
+  num_blocks: 7
+
+classifier_linear: # make no changes
+  filter_growth_rate: 2
+  dropout_rate: 0.2
+  final_channel: 12
+  activation_function: RReLU
+  initial_out_channels: 32
+  final_layer: 'linear'
+  num_blocks: 7
+
+discriminator_nlrl: # make no changes
+  name: "GAN" # GAN for ddpm and CGAN for cddpm
+  hidden_channels: 64
+  noise_dim: 110
+  final_layer: 'nlrl'
+
+discriminator_linear: # make no changes
+  name: "GAN" # GAN for ddpm and CGAN for cddpm
+  hidden_channels: 64
+  noise_dim: 110 
+  final_layer: 'linear'
